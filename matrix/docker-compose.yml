@@ -1,0 +1,71 @@
+# This compose file is compatible with Compose itself, it might need some
+# adjustments to run properly with stack.
+
+version: '3'
+
+services:
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:v1.43.0
+    restart: unless-stopped
+    environment:
+      - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
+    volumes:
+      - ./files:/data
+      - ./matrix-appservice-voip/registration.yaml:/data/bridge/matrix-appservice-voip/registration.yaml
+      - ./matrix-appservice-pstn/config/registration.yml:/data/bridge/matrix-appservice-pstn/registration.yaml
+      - ./matrix-bifrost/bifrost-registration.yaml:/data/bridge/matrix-bifrost/bifrost-registration.yaml
+      - ./matrix-appservice-respoke/config/respoke-registration.yaml:/data/bridge/matrix-appservice-respoke/respoke-registration.yaml
+    depends_on:
+      - db
+    networks:
+      default:
+      external:
+    ports:
+      - 8008:8008/tcp
+  db:
+    image: docker.io/postgres:12-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=57dJYP6Ws2p62r
+      # ensure the database gets created correctly
+      # https://matrix-org.github.io/synapse/latest/postgres.html#set-up-database
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      #- ./schemas:/var/lib/postgresql/data
+      - ./schemas_matrixv1.43:/var/lib/postgresql/data
+
+  element:
+    image: vectorim/element-web:v1.8.0
+    restart: unless-stopped
+    networks:
+      default:
+      external:
+    ports:
+      - 8000:80/tcp
+    volumes:
+      - ./element-config.json:/app/config.json
+      
+  synapse-tunnel:
+    image: cloudflare/cloudflared
+    command: tunnel --no-autoupdate run
+    env_file: .synapse-tunnel.env
+    restart: unless-stopped
+    networks:
+      external:
+    depends_on:
+      - synapse
+      
+  element-tunnel:
+    image: cloudflare/cloudflared
+    command: tunnel --no-autoupdate run
+    env_file: .element-tunnel.env
+    restart: unless-stopped
+    networks:
+      external:
+    depends_on:
+      - element
+
+networks:
+  external:

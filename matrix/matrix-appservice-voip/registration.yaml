@@ -1,0 +1,11 @@
+id: "appservice-voip"
+url: "http://localhost:8092"
+as_token: "corner-headfirst-hula"
+hs_token: "probing-passion-mathE"
+sender_localpart: "appservice-voip"
+namespaces:
+  users:
+    - regex: "@_voip_*"
+      exclusive: true
+  aliases: []
+  rooms: []

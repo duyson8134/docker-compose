@@ -1,0 +1,54 @@
+# Configuration file for Synapse.
+#
+# This is a YAML file: see [1] for a quick introduction. Note in particular
+# that *indentation is important*: all the elements of a list or dictionary
+# should have the same indentation.
+#
+# [1] https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+#
+# For more information on how to configure Synapse, including a complete accounting of
+# each option, go to docs/usage/configuration/config_documentation.md or
+# https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
+server_name: "matrix.x85.work"
+pid_file: /data/homeserver.pid
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    resources:
+      - names: [client, federation]
+        compress: false
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: 57dJYP6Ws2p62r
+    database: synapse
+    host: db
+    cp_min: 5
+    cp_max: 10
+log_config: "/data/matrix.x85.work.log.config"
+media_store_path: /data/media_store
+registration_shared_secret: "PPUNGYKM7Z6&R+MrqHJS8C@.Ll_*i9-T0*ySC,;er1~_vu:XLF"
+report_stats: true
+macaroon_secret_key: "-7j8u2d&HhK;+c94hjlzH,d6wtdCMDs#+DhjGm1TrH-ZGG.zO_"
+form_secret: "*p_09E*9x@yozM~^-nIw;nlW-z0XLsR4~20Ae=&S6.xEUxK.Yh"
+signing_key_path: "/data/matrix.x85.work.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"
+registration_shared_secret: "embark-portable-disposal"
+serve_server_wellknown: true
+turn_uris: [ "turn:172.22.203.0?transport=udp", "turn:172.22.203.0?transport=tcp" ]
+turn_shared_secret: "darling-providing-attire"
+turn_user_lifetime: 86400000
+turn_allow_guests: True
+app_service_config_files:
+  #- "/data/bridge/matrix-appservice-voip/registration.yaml"
+  - "/data/bridge/matrix-appservice-pstn/registration.yaml"
+  #- "/data/bridge/matrix-appservice-pstn-asterisk/registration.yaml"
+  #- "/data/bridge/matrix-bifrost/bifrost-registration.yaml"
+  #- "/data/bridge/matrix-appservice-respoke/respoke-registration.yaml"
+
+# vim:ft=yaml
+  
